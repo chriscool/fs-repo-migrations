@@ -71,6 +71,29 @@ test_sort_cmp() {
 	test_cmp "$1_sorted" "$2_sorted"
 }
 
+# test_config_set helps us make sure _we really did set_ a config value.
+# it sets it and then tests it. This became elaborate because ipfs config
+# was setting really weird things and am not sure why.
+test_config_set() {
+
+	# grab flags (like --bool in "ipfs config --bool")
+	test_cfg_flags="" # unset in case.
+	test "$#" = 3 && { test_cfg_flags=$1; shift; }
+
+	test_cfg_key=$1
+	test_cfg_val=$2
+
+	# when verbose, tell the user what config values are being set
+	test_cfg_cmd="ipfs config $test_cfg_flags \"$test_cfg_key\" \"$test_cfg_val\""
+	test "$TEST_VERBOSE" = 1 && echo "$test_cfg_cmd"
+
+	# ok try setting the config key/val pair.
+	ipfs config $test_cfg_flags "$test_cfg_key" "$test_cfg_val"
+	echo "$test_cfg_val" >cfg_set_expected
+	ipfs config "$test_cfg_key" >cfg_set_actual
+	test_cmp cfg_set_expected cfg_set_actual
+}
+
 LOCAL_IPFS_UPDATE="../bin/ipfs-update"
 GUEST_IPFS_UPDATE="sharness/bin/ipfs-update"
 
