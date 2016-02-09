@@ -12,6 +12,23 @@ test_install_version "v0.3.10"
 
 
 
+test_expect_success "setup iptb nodes" '
+	iptb init -n 5 -f --bootstrap=none --port=0
+'
+
+test_expect_success "start up iptb nodes" '
+    iptb start
+'
+
+test_expect_success "check peers works" '
+    ipfs swarm peers >peers_out
+'
+
+test_expect_success "correct number of peers" '
+    test -z "`cat peers_out`"
+'
+
+
 
 
 test_install_version "v0.4.0-dev"
